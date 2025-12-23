@@ -1,0 +1,125 @@
+<!-- accounts/templates/accounts/profile_edit.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}编辑个人资料 - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-person-badge me-2"></i>
+                        编辑个人资料
+                    </h4>
+                </div>
+
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                    <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">用户名</label>
+                                {{ form.username }}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">邮箱</label>
+                                {{ form.email }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">名</label>
+                                {{ form.first_name }}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">姓</label>
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">个人简介</label>
+                            {{ form.bio }}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">网站</label>
+                                {{ form.website }}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">所在地</label>
+                                {{ form.location }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">生日</label>
+                            {{ form.date_of_birth }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">头像</label>
+                            {{ form.profile_picture }}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">GitHub</label>
+                                {{ form.github }}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Twitter</label>
+                                {{ form.twitter }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Facebook</label>
+                                {{ form.facebook }}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">LinkedIn</label>
+                                {{ form.linkedin }}
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'accounts:profile' username=request.user.username %}"
+                               class="btn btn-secondary me-md-2">
+                                取消
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                保存更改
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

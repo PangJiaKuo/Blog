@@ -1,0 +1,223 @@
+<!-- accounts/templates/accounts/login.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}登录 - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white text-center py-4">
+                <h2 class="mb-0">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                    欢迎回来
+                </h2>
+                <p class="mb-0 mt-2 small">登录您的账户，继续您的创作</p>
+            </div>
+
+            <div class="card-body p-4 p-md-5">
+                {% if form.errors %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    用户名或密码错误，请重试
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endif %}
+
+                {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>{{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if next %}
+                    {% if user.is_authenticated %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-circle me-2"></i>
+                        您的账户没有访问该页面的权限。请使用有权限的账户登录。
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        请先登录以访问此页面。
+                    </div>
+                    {% endif %}
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    {% if next %}
+                    <input type="hidden" name="next" value="{{ next }}">
+                    {% endif %}
+
+                    <!-- 用户名/邮箱 -->
+                    <div class="mb-4">
+                        <label for="id_username" class="form-label fw-bold">
+                            <i class="bi bi-person me-1"></i> 用户名或邮箱
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="bi bi-person-circle"></i>
+                            </span>
+                            <input type="text"
+                                   name="username"
+                                   id="id_username"
+                                   class="form-control form-control-lg {% if form.username.errors %}is-invalid{% endif %}"
+                                   value="{{ form.username.value|default:'' }}"
+                                   placeholder="请输入用户名或邮箱"
+                                   required
+                                   autofocus>
+                        </div>
+                        {% if form.username.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.username.errors.0 }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 密码 -->
+                    <div class="mb-4">
+                        <label for="id_password" class="form-label fw-bold">
+                            <i class="bi bi-key me-1"></i> 密码
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="bi bi-shield-lock"></i>
+                            </span>
+                            <input type="password"
+                                   name="password"
+                                   id="id_password"
+                                   class="form-control form-control-lg {% if form.password.errors %}is-invalid{% endif %}"
+                                   placeholder="请输入密码"
+                                   required>
+                            <button type="button"
+                                    class="btn btn-outline-secondary toggle-password"
+                                    data-target="id_password">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        {% if form.password.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.password.errors.0 }}
+                        </div>
+                        {% endif %}
+
+                        <!-- 记住我 -->
+                        <div class="form-check mt-3">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   name="remember"
+                                   id="remember">
+                            <label class="form-check-label small" for="remember">
+                                记住我（30天内自动登录）
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 提交按钮 -->
+                    <div class="d-grid gap-2 mb-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-box-arrow-in-right me-2"></i> 立即登录
+                        </button>
+                    </div>
+                </form>
+
+                <!-- 忘记密码 -->
+                <div class="text-center mb-4">
+                    <a href="{% url 'accounts:password_reset' %}" class="text-decoration-none small">
+                        <i class="bi bi-question-circle me-1"></i> 忘记密码？
+                    </a>
+                </div>
+
+                <!-- 第三方登录 -->
+                <div class="text-center mb-4">
+                    <div class="position-relative">
+                        <hr>
+                        <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small">
+                            使用第三方账号登录
+                        </span>
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-3 mt-4">
+                        <button type="button" class="btn btn-outline-primary">
+                            <i class="bi bi-google"></i> Google
+                        </button>
+                        <button type="button" class="btn btn-outline-dark">
+                            <i class="bi bi-github"></i> GitHub
+                        </button>
+                        <button type="button" class="btn btn-outline-info">
+                            <i class="bi bi-weibo"></i> 微博
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 注册链接 -->
+                <div class="card bg-light border-0">
+                    <div class="card-body text-center p-3">
+                        <p class="mb-2 small">还没有账户？</p>
+                        <a href="{% url 'accounts:register' %}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-person-plus me-1"></i> 免费注册
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 密码显示/隐藏切换
+document.querySelectorAll('.toggle-password').forEach(button => {
+    button.addEventListener('click', function() {
+        const targetId = this.getAttribute('data-target');
+        const input = document.getElementById(targetId);
+        const icon = this.querySelector('i');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
+    });
+});
+
+// 自动填充用户名（如果有）
+const urlParams = new URLSearchParams(window.location.search);
+const username = urlParams.get('username');
+if (username && document.getElementById('id_username')) {
+    document.getElementById('id_username').value = username;
+}
+
+// 表单提交前检查
+document.querySelector('form').addEventListener('submit', function(e) {
+    const username = document.getElementById('id_username').value.trim();
+    const password = document.getElementById('id_password').value.trim();
+
+    if (!username) {
+        e.preventDefault();
+        alert('请输入用户名或邮箱');
+        document.getElementById('id_username').focus();
+        return false;
+    }
+
+    if (!password) {
+        e.preventDefault();
+        alert('请输入密码');
+        document.getElementById('id_password').focus();
+        return false;
+    }
+});
+</script>
+{% endblock %}

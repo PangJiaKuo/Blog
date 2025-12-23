@@ -1,0 +1,520 @@
+<!-- blog/templates/blog/draft_list.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}我的草稿 - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <!-- 页面标题 -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body text-center">
+                <h1 class="display-5 fw-bold mb-3">
+                    <i class="bi bi-file-earmark-text me-2"></i>
+                    我的草稿箱
+                </h1>
+
+                <div class="lead mb-4">
+                    这里保存着您还未发布的文章草稿
+                </div>
+
+                <!-- 草稿统计 -->
+                <div class="d-flex justify-content-center gap-4 mt-4">
+                    <div class="text-center">
+                        <div class="fs-3 fw-bold">{{ articles.paginator.count }}</div>
+                        <div class="text-muted">篇草稿</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="fs-3 fw-bold">
+                            {{ total_characters }}
+                        </div>
+                        <div class="text-muted">总字数</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="fs-3 fw-bold">
+                            {{ oldest_draft_days }}
+                        </div>
+                        <div class="text-muted">天前（最旧）</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 草稿操作 -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <a href="{% url 'blog:article_create' %}" class="btn btn-success">
+                            <i class="bi bi-plus-circle"></i> 新建草稿
+                        </a>
+                        <button class="btn btn-outline-secondary" id="toggle-selection">
+                            <i class="bi bi-check2-square"></i> 批量操作
+                        </button>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="bi bi-filter"></i> 筛选排序
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="?sort=-updated_at">
+                                    <i class="bi bi-sort-down"></i> 最近修改
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="?sort=updated_at">
+                                    <i class="bi bi-sort-up"></i> 最早修改
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="?sort=title">
+                                    <i class="bi bi-sort-alpha-down"></i> 标题 A-Z
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="?sort=-title">
+                                    <i class="bi bi-sort-alpha-up"></i> 标题 Z-A
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="?">
+                                    <i class="bi bi-arrow-clockwise"></i> 重置筛选
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 草稿列表 -->
+        {% if articles %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <input type="checkbox" class="form-check-input" id="select-all" style="display: none;">
+                    </div>
+                    <div class="col-5">标题</div>
+                    <div class="col-3">最后修改</div>
+                    <div class="col-2">字数</div>
+                    <div class="col-1 text-center">操作</div>
+                </div>
+            </div>
+
+            <div class="list-group list-group-flush">
+                {% for article in articles %}
+                <div class="list-group-item list-group-item-action">
+                    <div class="row align-items-center">
+                        <!-- 选择框 -->
+                        <div class="col">
+                            <input type="checkbox"
+                                   class="form-check-input draft-checkbox"
+                                   data-draft-id="{{ article.id }}"
+                                   style="display: none;">
+                        </div>
+
+                        <!-- 标题 -->
+                        <div class="col-5">
+                            <div class="d-flex align-items-start">
+                                {% if article.featured_image %}
+                                <img src="{{ article.featured_image.url }}"
+                                     alt="{{ article.title }}"
+                                     class="rounded me-2"
+                                     width="50"
+                                     height="50"
+                                     style="object-fit: cover;">
+                                {% else %}
+                                <div class="bg-secondary d-flex align-items-center justify-content-center rounded me-2"
+                                     style="width:50px;height:50px;">
+                                    <i class="bi bi-file-earmark-text text-white"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <h6 class="mb-1 fw-bold">
+                                        <a href="{% url 'blog:article_update' article.pk %}"
+                                           class="text-decoration-none">
+                                            {{ article.title|default:"无标题草稿" }}
+                                        </a>
+                                    </h6>
+                                    {% if article.category %}
+                                    <span class="badge bg-primary small">{{ article.category.name }}</span>
+                                    {% endif %}
+                                    {% if article.tags.all %}
+                                    <div class="mt-1">
+                                        {% for tag in article.tags.all|slice:":3" %}
+                                        <span class="badge bg-light text-dark small">{{ tag.name }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 修改时间 -->
+                        <div class="col-3">
+                            <div class="text-muted small">
+                                <div class="mb-1">{{ article.updated_at|date:"Y-m-d H:i" }}</div>
+                                <div class="text-info">
+                                    {% with days_since=article.updated_at|timesince %}
+                                    {{ days_since }}前修改
+                                    {% endwith %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 字数统计 -->
+                        <div class="col-2">
+                            <div class="text-center">
+                                <div class="fw-bold">{{ article.word_count }}</div>
+                                <div class="text-muted small">字</div>
+                            </div>
+                        </div>
+
+                        <!-- 操作按钮 -->
+                        <div class="col-1 text-center">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                        type="button"
+                                        data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'blog:article_update' article.pk %}">
+                                            <i class="bi bi-pencil me-2"></i> 编辑
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#"
+                                           onclick="publishDraft({{ article.id }})">
+                                            <i class="bi bi-check-circle me-2"></i> 发布
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger"
+                                           href="#"
+                                           data-bs-toggle="modal"
+                                           data-bs-target="#deleteDraftModal"
+                                           data-draft-id="{{ article.id }}"
+                                           data-draft-title="{{ article.title|default:'无标题草稿' }}">
+                                            <i class="bi bi-trash me-2"></i> 删除
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 进度条（如果有） -->
+                    {% if article.completion_percentage %}
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <div class="progress" style="height: 5px;">
+                                <div class="progress-bar bg-success"
+                                     role="progressbar"
+                                     style="width: {{ article.completion_percentage }}%"
+                                     aria-valuenow="{{ article.completion_percentage }}"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100"></div>
+                            </div>
+                            <div class="text-end small text-muted">
+                                {{ article.completion_percentage }}% 完成度
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 批量操作栏 -->
+        <div class="card shadow-sm mb-4" id="bulk-actions" style="display: none;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span id="selected-count">0</span> 个草稿已选中
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-success" onclick="publishSelected()">
+                            <i class="bi bi-check-circle"></i> 批量发布
+                        </button>
+                        <button type="button" class="btn btn-outline-danger"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteMultipleModal">
+                            <i class="bi bi-trash"></i> 批量删除
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="clearSelection()">
+                            <i class="bi bi-x-circle"></i> 取消选择
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 空状态 -->
+        {% else %}
+        <div class="card shadow-sm text-center py-5">
+            <div class="card-body">
+                <i class="bi bi-journal-x display-1 text-muted"></i>
+                <h3 class="mt-3">草稿箱空空如也</h3>
+                <p class="text-muted mb-4">您还没有创建任何草稿</p>
+                <a href="{% url 'blog:article_create' %}" class="btn btn-success btn-lg">
+                    <i class="bi bi-plus-circle"></i> 创建第一篇草稿
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 分页 -->
+        {% if is_paginated %}
+        <nav aria-label="草稿分页" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1" aria-label="首页">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="上一页">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="下一页">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="末页">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 删除单个草稿确认模态框 -->
+<div class="modal fade" id="deleteDraftModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">确认删除草稿</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>确定要删除草稿 "<span id="draft-title"></span>" 吗？此操作不可恢复。</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <form method="post" action="" id="delete-draft-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="draft_id" id="delete-draft-id">
+                    <button type="submit" class="btn btn-danger">确认删除</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 批量删除确认模态框 -->
+<div class="modal fade" id="deleteMultipleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">确认批量删除</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>确定要删除选中的 <span id="delete-count">0</span> 篇草稿吗？此操作不可恢复。</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-danger" onclick="deleteSelected()">确认删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let selectedDrafts = new Set();
+
+// 切换批量选择模式
+document.getElementById('toggle-selection').addEventListener('click', function() {
+    const checkboxes = document.querySelectorAll('.draft-checkbox');
+    const bulkActions = document.getElementById('bulk-actions');
+    const showCheckboxes = checkboxes[0].style.display === 'none';
+
+    checkboxes.forEach(cb => {
+        cb.style.display = showCheckboxes ? 'block' : 'none';
+    });
+
+    bulkActions.style.display = showCheckboxes ? 'block' : 'none';
+
+    if (!showCheckboxes) {
+        clearSelection();
+    }
+});
+
+// 全选/取消全选
+document.getElementById('select-all')?.addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.draft-checkbox');
+    checkboxes.forEach(cb => {
+        cb.checked = this.checked;
+        updateSelection(cb);
+    });
+    updateSelectedCount();
+});
+
+// 更新选择状态
+function updateSelection(checkbox) {
+    const draftId = checkbox.dataset.draftId;
+    const listItem = checkbox.closest('.list-group-item');
+
+    if (checkbox.checked) {
+        selectedDrafts.add(draftId);
+        listItem.classList.add('bg-light');
+    } else {
+        selectedDrafts.delete(draftId);
+        listItem.classList.remove('bg-light');
+    }
+}
+
+// 更新选中计数
+function updateSelectedCount() {
+    const count = selectedDrafts.size;
+    document.getElementById('selected-count').textContent = count;
+    document.getElementById('delete-count').textContent = count;
+}
+
+// 清除选择
+function clearSelection() {
+    selectedDrafts.clear();
+    document.querySelectorAll('.draft-checkbox').forEach(cb => {
+        cb.checked = false;
+        cb.closest('.list-group-item').classList.remove('bg-light');
+    });
+    updateSelectedCount();
+}
+
+// 发布草稿
+function publishDraft(draftId) {
+    if (confirm('确定要发布这篇草稿吗？发布后文章将对所有用户可见。')) {
+        fetch(`/blog/article/${draftId}/publish/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('草稿已发布！');
+                location.reload();
+            } else {
+                alert('发布失败：' + data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
+
+// 批量发布
+function publishSelected() {
+    if (selectedDrafts.size === 0) {
+        alert('请先选择要发布的草稿');
+        return;
+    }
+
+    if (confirm(`确定要发布 ${selectedDrafts.size} 篇草稿吗？`)) {
+        fetch('/blog/drafts/publish-multiple/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ draft_ids: Array.from(selectedDrafts) })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`成功发布 ${data.published_count} 篇草稿`);
+                location.reload();
+            } else {
+                alert('发布失败：' + data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
+
+// 删除单个草稿
+document.getElementById('deleteDraftModal').addEventListener('show.bs.modal', function(event) {
+    const button = event.relatedTarget;
+    const draftId = button.getAttribute('data-draft-id');
+    const draftTitle = button.getAttribute('data-draft-title');
+
+    document.getElementById('draft-title').textContent = draftTitle;
+    document.getElementById('delete-draft-id').value = draftId;
+    document.getElementById('delete-draft-form').action = `/blog/article/${draftId}/delete/`;
+});
+
+// 批量删除
+function deleteSelected() {
+    if (selectedDrafts.size === 0) return;
+
+    fetch('/blog/drafts/delete-multiple/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ draft_ids: Array.from(selectedDrafts) })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(`成功删除 ${data.deleted_count} 篇草稿`);
+            location.reload();
+        } else {
+            alert('删除失败：' + data.error);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// 初始化事件监听
+document.addEventListener('DOMContentLoaded', function() {
+    // 复选框变化事件
+    document.querySelectorAll('.draft-checkbox').forEach(cb => {
+        cb.addEventListener('change', function() {
+            updateSelection(this);
+            updateSelectedCount();
+        });
+    });
+});
+</script>
+{% endblock %}

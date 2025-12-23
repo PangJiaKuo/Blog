@@ -1,0 +1,115 @@
+<!-- accounts/templates/accounts/settings.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}用户设置 - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">设置</h5>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'accounts:settings' %}"
+                           class="list-group-item list-group-item-action active">
+                            <i class="bi bi-gear me-2"></i>常规设置
+                        </a>
+                        <a href="{% url 'accounts:change_password' %}"
+                           class="list-group-item list-group-item-action">
+                            <i class="bi bi-key me-2"></i>修改密码
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="bi bi-bell me-2"></i>通知设置
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="bi bi-shield me-2"></i>隐私设置
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="card shadow-lg">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">常规设置</h5>
+                </div>
+
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                    <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">博客主题</label>
+                                {{ form.theme }}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">每页显示文章数</label>
+                                {{ form.posts_per_page }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">博客标题</label>
+                            {{ form.blog_title }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">博客描述</label>
+                            {{ form.blog_description }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">博客背景图片</label>
+                            {{ form.background_image }}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check mb-3">
+                                    {{ form.show_email }}
+                                    <label class="form-check-label">在个人资料中显示邮箱</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-check mb-3">
+                                    {{ form.allow_comments }}
+                                    <label class="form-check-label">允许评论</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            {{ form.allow_guest_comments }}
+                            <label class="form-check-label">允许游客评论</label>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                保存设置
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

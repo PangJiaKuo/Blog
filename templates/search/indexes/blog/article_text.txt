@@ -1,0 +1,5 @@
+{{ object.title }}
+{{ object.content|striptags }}
+{{ object.excerpt }}
+{% for tag in object.tags.all %}{{ tag.name }} {% endfor %}
+{% if object.category %}{{ object.category.name }}{% endif %}

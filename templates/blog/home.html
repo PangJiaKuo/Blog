@@ -1,0 +1,184 @@
+
+{#{% block title %}首页 - 我的博客{% endblock %}#}
+<!-- templates/blog/home.html -->
+{% extends "base.html" %}
+
+{% block title %}首页 - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- 主要内容 -->
+    <div class="col-lg-8">
+        <!-- 推荐文章 -->
+        {% if featured_articles %}
+        <div class="mb-5">
+            <h2 class="border-bottom pb-2">推荐文章</h2>
+            <div class="row">
+                {% for article in featured_articles %}
+                <div class="col-md-6 mb-4">
+                    <div class="card article-card h-100">
+                        {% if article.featured_image %}
+                        <img src="{{ article.featured_image.url }}" class="card-img-top" alt="{{ article.title }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{% url 'blog:article_detail' article.slug %}" class="text-decoration-none text-dark">
+                                    {{ article.title }}
+                                </a>
+                            </h5>
+                            <p class="card-text">{{ article.excerpt|truncatechars:100 }}</p>
+                            <small class="text-muted">
+                                <i class="fas fa-user"></i> {{ article.author.username }} |
+                                <i class="fas fa-calendar"></i> {{ article.created_at|date:"Y-m-d" }} |
+                                <i class="fas fa-eye"></i> {{ article.view_count }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 最新文章 -->
+        <h2 class="border-bottom pb-2 mb-4">最新文章</h2>
+
+        {% for article in articles %}
+        <div class="card mb-4 article-card">
+            <div class="card-body">
+                <div class="row">
+                    {% if article.featured_image %}
+                    <div class="col-md-4">
+                        <img src="{{ article.featured_image.url }}" class="img-fluid rounded" alt="{{ article.title }}">
+                    </div>
+                    <div class="col-md-8">
+                    {% else %}
+                    <div class="col-12">
+                    {% endif %}
+                        <h3 class="card-title">
+                            <a href="{% url 'blog:article_detail' article.slug %}"
+                               class="text-decoration-none text-dark">
+                                {{ article.title }}
+                            </a>
+                        </h3>
+                    <p class="card-text">{{ article.excerpt|truncatechars:200 }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fas fa-user"></i> {{ article.author.username }} |
+                            <i class="fas fa-folder"></i>
+                            {% if article.category and article.category.slug %}
+                                <a href="{% url 'blog:category' article.category.slug %}" class="text-muted">
+                                    {{ article.category.name }}
+                                </a> |
+                            {% else %}
+                                <span class="text-muted">未分类</span> |
+                            {% endif %}
+                            <i class="fas fa-calendar"></i> {{ article.created_at|date:"Y-m-d" }} |
+                            <i class="fas fa-eye"></i> {{ article.view_count }}
+                        </small>
+                            <a href="{% url 'blog:article_detail' article.slug %}" class="btn btn-sm btn-outline-primary">阅读更多</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="alert alert-info">
+            暂无文章，快来创建你的第一篇文章吧！
+        </div>
+        {% endfor %}
+
+        <!-- 分页 -->
+        {% if is_paginated %}
+        <nav aria-label="文章分页">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">上一页</a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">下一页</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+
+    <!-- 侧边栏 -->
+    <div class="col-lg-4">
+        <!-- 分类 -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">文章分类</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    {% for category in categories %}
+                    <li class="mb-2">
+                        <a href="{% url 'blog:category' category.slug %}" class="text-decoration-none">
+                            <i class="fas fa-folder me-2"></i>{{ category.name }}
+                        </a>
+                    </li>
+                    {% empty %}
+                    <li>暂无分类</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- 写文章按钮 -->
+        {% if user.is_authenticated %}
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <a href="{% url 'blog:article_create' %}" class="btn btn-primary btn-lg w-100">
+                    <i class="fas fa-pen"></i> 写文章
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 统计信息 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">博客统计</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <div class="display-6">{{ articles.count }}</div>
+                        <small class="text-muted">文章总数</small>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="display-6">{{ categories.count }}</div>
+                        <small class="text-muted">分类数量</small>
+                    </div>
+                    {% if user.is_authenticated %}
+                    <div class="col-12">
+                        <a href="{% url 'admin:index' %}" class="btn btn-outline-secondary btn-sm w-100">
+                            <i class="fas fa-cog"></i> 管理后台
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

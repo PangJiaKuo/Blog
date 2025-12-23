@@ -1,0 +1,104 @@
+<!-- templates/search/search.html -->
+{% extends 'base.html' %}
+
+{% block title %}搜索 - 我的博客{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">搜索文章</h2>
+                <form method="get" action="{% url 'search:search' %}" class="d-flex">
+                    <input type="text" name="q" value="{{ query }}" class="form-control me-2" placeholder="输入关键词搜索...">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> 搜索
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {% if query %}
+        <div class="mb-4">
+            <h4>
+                {% if results %}
+                    找到 {{ total_results }} 条关于 "{{ query }}" 的结果
+                {% else %}
+                    没有找到关于 "{{ query }}" 的结果
+                {% endif %}
+            </h4>
+        </div>
+
+        {% if results %}
+            {% for article in results %}
+            <div class="card mb-4 article-card">
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <a href="{% url 'blog:article_detail' article.slug %}" class="text-decoration-none text-dark">
+                            {{ article.title }}
+                        </a>
+                    </h3>
+                    <p class="card-text">{{ article.excerpt|truncatechars:200 }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fas fa-user"></i> {{ article.author.username }} |
+                            <i class="fas fa-folder"></i>
+                            <a href="{% url 'blog:category' article.category.slug %}" class="text-muted">
+                                {{ article.category.name }}
+                            </a> |
+                            <i class="fas fa-calendar"></i> {{ article.created_at|date:"Y-m-d" }} |
+                            <i class="fas fa-eye"></i> {{ article.view_count }}
+                        </small>
+                        <a href="{% url 'blog:article_detail' article.slug %}" class="btn btn-sm btn-outline-primary">阅读更多</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info">
+                <p>没有找到与 "{{ query }}" 相关的文章。</p>
+                <p class="mb-0">建议：</p>
+                <ul class="mb-0">
+                    <li>检查输入的关键词是否有误</li>
+                    <li>尝试使用其他关键词</li>
+                    <li>浏览<a href="{% url 'blog:home' %}">首页</a>查看所有文章</li>
+                </ul>
+            </div>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <!-- 侧边栏 -->
+    <div class="col-lg-4">
+        <!-- 热门搜索 -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">热门搜索</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap">
+                    <a href="{% url 'search:search' %}?q=Django" class="badge bg-secondary text-decoration-none m-1">Django</a>
+                    <a href="{% url 'search:search' %}?q=Python" class="badge bg-secondary text-decoration-none m-1">Python</a>
+                    <a href="{% url 'search:search' %}?q=博客" class="badge bg-secondary text-decoration-none m-1">博客</a>
+                    <a href="{% url 'search:search' %}?q=Web开发" class="badge bg-secondary text-decoration-none m-1">Web开发</a>
+                    <a href="{% url 'search:search' %}?q=数据库" class="badge bg-secondary text-decoration-none m-1">数据库</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 搜索提示 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">搜索提示</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><i class="fas fa-lightbulb text-warning me-2"></i>使用具体的关键词</li>
+                    <li class="mb-2"><i class="fas fa-lightbulb text-warning me-2"></i>尝试不同的关键词组合</li>
+                    <li class="mb-2"><i class="fas fa-lightbulb text-warning me-2"></i>查看分类获取更多文章</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

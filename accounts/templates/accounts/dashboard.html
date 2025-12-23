@@ -1,0 +1,179 @@
+<!-- accounts/templates/accounts/dashboard.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}仪表板 - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-3">
+            <!-- 用户信息卡片 -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    {% if user.profile_picture %}
+                    <img src="{{ user.profile_picture.url }}"
+                         class="rounded-circle mb-3"
+                         width="100" height="100"
+                         alt="{{ user.username }}">
+                    {% else %}
+                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3"
+                         style="width:100px;height:100px;">
+                        <i class="bi bi-person text-white" style="font-size: 3rem;"></i>
+                    </div>
+                    {% endif %}
+
+                    <h5 class="card-title">{{ user.username }}</h5>
+                    <p class="text-muted small">{{ user.email }}</p>
+
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'accounts:profile' username=user.username %}"
+                           class="btn btn-outline-primary btn-sm">
+                            查看个人资料
+                        </a>
+                        <a href="{% url 'accounts:profile_edit' username=user.username %}"
+                           class="btn btn-outline-secondary btn-sm">
+                            编辑资料
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 快捷操作 -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">快捷操作</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="http://127.0.0.1:8000/blog/create/" class="btn btn-success btn-sm">
+                            <i class="bi bi-plus-circle me-1"></i> 写新文章
+                        </a>
+                        <a href="{% url 'accounts:settings' %}" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-gear me-1"></i> 设置
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <!-- 统计卡片 -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card bg-primary text-white shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title">总文章数</h6>
+                                    <h2 class="mb-0">{{ total_articles }}</h2>
+                                </div>
+                                <i class="bi bi-file-text display-6 opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card bg-success text-white shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title">已发布</h6>
+                                    <h2 class="mb-0">{{ published_count }}</h2>
+                                </div>
+                                <i class="bi bi-check-circle display-6 opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card bg-warning text-white shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title">草稿</h6>
+                                    <h2 class="mb-0">{{ draft_count }}</h2>
+                                </div>
+                                <i class="bi bi-pencil display-6 opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 最近文章 -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">最近文章</h5>
+                    <a href="#" class="btn btn-sm btn-outline-primary">查看全部</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_articles %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>标题</th>
+                                    <th>状态</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for article in recent_articles %}
+                                <tr>
+                                    <td>{{ article.title|truncatechars:30 }}</td>
+                                    <td>
+                                        {% if article.status == 'published' %}
+                                        <span class="badge bg-success">已发布</span>
+                                        {% else %}
+                                        <span class="badge bg-warning">草稿</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ article.created_at|date:"Y-m-d" }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="#" class="btn btn-outline-primary">编辑</a>
+                                            <a href="#" class="btn btn-outline-danger">删除</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-4">暂无文章，开始创作吧！</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- 热门文章 -->
+            {% if popular_articles %}
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">热门文章</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for article in popular_articles %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ article.title }}</h6>
+                                <small class="text-muted">
+                                    <i class="bi bi-eye me-1"></i>{{ article.view_count }}
+                                </small>
+                            </div>
+                            <p class="mb-1 small text-muted">{{ article.summary|truncatechars:80 }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

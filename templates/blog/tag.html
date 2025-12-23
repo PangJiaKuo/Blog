@@ -1,0 +1,240 @@
+<!-- blog/templates/blog/tag.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ tag.name }} - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <!-- 标签信息 -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body text-center">
+                <h1 class="display-5 fw-bold mb-3">
+                    <i class="bi bi-tag-fill me-2" style="color: {{ tag.color|default:'#6c757d' }}"></i>
+                    {{ tag.name }}
+                </h1>
+
+                <div class="d-flex justify-content-center gap-4 mt-4">
+                    <div class="text-center">
+                        <div class="fs-3 fw-bold">{{ articles.paginator.count }}</div>
+                        <div class="text-muted">篇文章</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="fs-3 fw-bold">
+                            {% with total_views=articles|map_attribute:'view_count'|sum %}
+                            {{ total_views|default:0 }}
+                            {% endwith %}
+                        </div>
+                        <div class="text-muted">次阅读</div>
+                    </div>
+                </div>
+
+                <!-- 相关标签 -->
+                {% if related_tags %}
+                <div class="mt-4">
+                    <h6 class="fw-bold mb-3">相关标签</h6>
+                    <div class="d-flex flex-wrap gap-2 justify-content-center">
+                        {% for related_tag in related_tags %}
+                        <a href="{% url 'blog:tag' related_tag.slug %}"
+                           class="badge bg-light text-dark text-decoration-none p-2">
+                            {{ related_tag.name }}
+                            <span class="badge bg-secondary rounded-pill ms-1">{{ related_tag.num_times }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 文章列表 -->
+        <h2 class="mb-4">标签文章</h2>
+
+        {% if articles %}
+        {% for article in articles %}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title h5">
+                    <a href="{{ article.get_absolute_url }}" class="text-decoration-none">
+                        {{ article.title }}
+                    </a>
+                </h3>
+
+                <div class="article-meta text-muted small mb-2">
+                    <i class="bi bi-person"></i> {{ article.author.username }}
+                    <i class="bi bi-calendar ms-2"></i> {{ article.created_at|date:"Y-m-d" }}
+                    <i class="bi bi-eye ms-2"></i> {{ article.view_count }}
+                    <i class="bi bi-heart ms-2"></i> {{ article.like_count }}
+                    <i class="bi bi-chat-left ms-2"></i> {{ article.comment_count }}
+                </div>
+
+                <!-- 分类 -->
+                {% if article.category %}
+                <a href="{% url 'blog:category' article.category.slug %}"
+                   class="badge bg-primary text-decoration-none mb-2">
+                    {{ article.category.name }}
+                </a>
+                {% endif %}
+
+                {% if article.excerpt %}
+                <p class="card-text">{{ article.excerpt|truncatechars:200 }}</p>
+                {% endif %}
+
+                <!-- 其他标签 -->
+                {% if article.tags.all %}
+                <div class="mt-3">
+                    {% for article_tag in article.tags.all %}
+                    <a href="{% url 'blog:tag' article_tag.slug %}"
+                       class="badge bg-light text-dark me-1 small {% if article_tag == tag %}border border-primary{% endif %}">
+                        <i class="bi bi-tag"></i> {{ article_tag.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="mt-3">
+                    <a href="{{ article.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
+                        阅读全文 <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-journal-x display-1 text-muted"></i>
+            <h3 class="mt-3">暂无文章</h3>
+            <p class="text-muted">该标签下暂时还没有文章。</p>
+            <a href="{% url 'blog:home' %}" class="btn btn-primary">
+                <i class="bi bi-house-door"></i> 返回首页
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- 分页 -->
+        {% if is_paginated %}
+        <nav aria-label="文章分页" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1" aria-label="首页">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="上一页">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="下一页">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="末页">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+
+    <!-- 侧边栏 -->
+    <div class="col-lg-4">
+        <!-- 热门标签 -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-tags"></i> 热门标签
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2">
+                    {% for tag_item in all_tags %}
+                    <a href="{% url 'blog:tag' tag_item.slug %}"
+                       class="badge bg-light text-dark text-decoration-none p-2 {% if tag_item == tag %}border border-primary{% endif %}">
+                        {{ tag_item.name }}
+                        <span class="badge bg-secondary rounded-pill ms-1">{{ tag_item.num_times }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 标签热门文章 -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-fire"></i> {{ tag.name }} 热门文章
+            </div>
+            <div class="list-group list-group-flush">
+                {% for article in popular_articles %}
+                <a href="{{ article.get_absolute_url }}" class="list-group-item list-group-item-action">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>{{ article.title|truncatechars:30 }}</span>
+                        <span class="badge bg-secondary">{{ article.view_count }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 标签统计 -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-info text-white">
+                <i class="bi bi-graph-up"></i> 标签统计
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <i class="bi bi-journal me-2"></i>
+                        文章总数: <strong>{{ articles.paginator.count }}</strong>
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-eye me-2"></i>
+                        总阅读量: <strong>
+                            {% with total_views=articles|map_attribute:'view_count'|sum %}
+                            {{ total_views|default:0 }}
+                            {% endwith %}
+                        </strong>
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-calendar me-2"></i>
+                        最早文章: <strong>{{ oldest_article.created_at|date:"Y-m-d" }}</strong>
+                    </li>
+                    <li>
+                        <i class="bi bi-calendar me-2"></i>
+                        最新文章: <strong>{{ newest_article.created_at|date:"Y-m-d" }}</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 标签页面特定功能
+document.addEventListener('DOMContentLoaded', function() {
+    // 标签颜色设置
+    const tagColor = '{{ tag.color|default:"#6c757d" }}';
+    const tagIcon = document.querySelector('.bi-tag-fill');
+    if (tagIcon) {
+        tagIcon.style.color = tagColor;
+    }
+});
+</script>
+{% endblock %}

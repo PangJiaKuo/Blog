@@ -1,0 +1,238 @@
+<!-- blog/templates/blog/category.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ category.name }} - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <!-- 分类信息 -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body text-center">
+                <h1 class="display-5 fw-bold mb-3">
+                    <i class="bi bi-grid-3x3-gap me-2"></i>
+                    {{ category.name }}
+                </h1>
+
+                {% if category.description %}
+                <p class="lead">{{ category.description }}</p>
+                {% endif %}
+
+                <div class="d-flex justify-content-center gap-4 mt-4">
+                    <div class="text-center">
+                        <div class="fs-3 fw-bold">{{ articles.paginator.count }}</div>
+                        <div class="text-muted">篇文章</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="fs-3 fw-bold">
+                            {% with total_views=articles|map_attribute:'view_count'|sum %}
+                            {{ total_views|default:0 }}
+                            {% endwith %}
+                        </div>
+                        <div class="text-muted">次阅读</div>
+                    </div>
+                    {% if category.parent %}
+                    <div class="text-center">
+                        <div class="fs-6 text-muted">上级分类</div>
+                        <a href="{% url 'blog:category' category.parent.slug %}"
+                           class="fw-bold text-decoration-none">
+                            {{ category.parent.name }}
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- 子分类 -->
+                {% if category.children.all %}
+                <div class="mt-4">
+                    <h6 class="fw-bold mb-3">子分类</h6>
+                    <div class="d-flex flex-wrap gap-2 justify-content-center">
+                        {% for child in category.children.all %}
+                        <a href="{% url 'blog:category' child.slug %}"
+                           class="badge bg-light text-dark text-decoration-none p-2">
+                            {{ child.name }}
+                            <span class="badge bg-secondary rounded-pill ms-1">{{ child.article_count }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 文章列表 -->
+        <h2 class="mb-4">分类文章</h2>
+
+        {% if articles %}
+        {% for article in articles %}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title h5">
+                    <a href="{{ article.get_absolute_url }}" class="text-decoration-none">
+                        {{ article.title }}
+                    </a>
+                </h3>
+
+                <div class="article-meta text-muted small mb-2">
+                    <i class="bi bi-person"></i> {{ article.author.username }}
+                    <i class="bi bi-calendar ms-2"></i> {{ article.created_at|date:"Y-m-d" }}
+                    <i class="bi bi-eye ms-2"></i> {{ article.view_count }}
+                    <i class="bi bi-heart ms-2"></i> {{ article.like_count }}
+                    <i class="bi bi-chat-left ms-2"></i> {{ article.comment_count }}
+                </div>
+
+                {% if article.excerpt %}
+                <p class="card-text">{{ article.excerpt|truncatechars:200 }}</p>
+                {% endif %}
+
+                <!-- 标签 -->
+                {% if article.tags.all %}
+                <div class="mt-3">
+                    {% for tag in article.tags.all %}
+                    <a href="{% url 'blog:tag' tag.slug %}" class="badge bg-light text-dark me-1 small">
+                        <i class="bi bi-tag"></i> {{ tag.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="mt-3">
+                    <a href="{{ article.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
+                        阅读全文 <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-journal-x display-1 text-muted"></i>
+            <h3 class="mt-3">暂无文章</h3>
+            <p class="text-muted">该分类下暂时还没有文章。</p>
+            <a href="{% url 'blog:home' %}" class="btn btn-primary">
+                <i class="bi bi-house-door"></i> 返回首页
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- 分页 -->
+        {% if is_paginated %}
+        <nav aria-label="文章分页" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1" aria-label="首页">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="上一页">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="下一页">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="末页">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+
+    <!-- 侧边栏 -->
+    <div class="col-lg-4">
+        <!-- 分类导航 -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-diagram-3"></i> 分类导航
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{% url 'blog:home' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    全部文章
+                    <span class="badge bg-primary rounded-pill">{{ total_articles }}</span>
+                </a>
+                {% for cat in categories %}
+                <a href="{% url 'blog:category' cat.slug %}"
+                   class="list-group-item list-group-item-action {% if cat == category %}active{% endif %} d-flex justify-content-between align-items-center">
+                    {{ cat.name }}
+                    <span class="badge {% if cat == category %}bg-light text-dark{% else %}bg-primary{% endif %} rounded-pill">
+                        {{ cat.article_count }}
+                    </span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 热门标签 -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-info text-white">
+                <i class="bi bi-tags"></i> 热门标签
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2">
+                    {% for tag in tags %}
+                    <a href="{% url 'blog:tag' tag.slug %}"
+                       class="badge bg-light text-dark text-decoration-none p-2">
+                        {{ tag.name }}
+                        <span class="badge bg-secondary rounded-pill ms-1">{{ tag.num_times }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 分类热门文章 -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-fire"></i> {{ category.name }} 热门文章
+            </div>
+            <div class="list-group list-group-flush">
+                {% for article in popular_articles %}
+                <a href="{{ article.get_absolute_url }}" class="list-group-item list-group-item-action">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>{{ article.title|truncatechars:30 }}</span>
+                        <span class="badge bg-secondary">{{ article.view_count }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 分类页面特定功能
+document.addEventListener('DOMContentLoaded', function() {
+    // 高亮当前分类
+    const currentCategory = '{{ category.slug }}';
+    const categoryLinks = document.querySelectorAll('.list-group-item[href*="category"]');
+
+    categoryLinks.forEach(link => {
+        if (link.href.includes(currentCategory)) {
+            link.classList.add('active');
+        }
+    });
+});
+</script>
+{% endblock %}

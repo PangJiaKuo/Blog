@@ -1,0 +1,88 @@
+<!-- templates/blog/article_form.html -->
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+    {% if form.instance.pk %}编辑文章{% else %}创建文章{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    {% if form.instance.pk %}
+                    <i class="fas fa-edit"></i> 编辑文章
+                    {% else %}
+                    <i class="fas fa-pen"></i> 创建文章
+                    {% endif %}
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <!-- 标题 -->
+                    <div class="mb-3">
+                        <label for="{{ form.title.id_for_label }}" class="form-label">标题</label>
+                        {{ form.title|add_class:"form-control" }}
+                        {% if form.title.errors %}
+                        <div class="text-danger">{{ form.title.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 内容 -->
+                    <div class="mb-3">
+                        <label for="{{ form.content.id_for_label }}" class="form-label">内容</label>
+                        {{ form.content|add_class:"form-control"|attr:"rows:10" }}
+                        {% if form.content.errors %}
+                        <div class="text-danger">{{ form.content.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 摘要 -->
+                    <div class="mb-3">
+                        <label for="{{ form.excerpt.id_for_label }}" class="form-label">摘要</label>
+                        {{ form.excerpt|add_class:"form-control"|attr:"rows:3" }}
+                        <small class="text-muted">（可选）文章的简短摘要</small>
+                    </div>
+
+                    <div class="row">
+                        <!-- 分类 -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.category.id_for_label }}" class="form-label">分类</label>
+                            {{ form.category|add_class:"form-select" }}
+                        </div>
+
+                        <!-- 状态 -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">状态</label>
+                            {{ form.status|add_class:"form-select" }}
+                        </div>
+                    </div>
+
+                    <!-- 特色图片 -->
+                    <div class="mb-3">
+                        <label for="{{ form.featured_image.id_for_label }}" class="form-label">特色图片</label>
+                        {{ form.featured_image|add_class:"form-control" }}
+                        <small class="text-muted">（可选）上传一张封面图片</small>
+                    </div>
+
+                    <!-- 提交按钮 -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'blog:home' %}" class="btn btn-secondary me-md-2">取消</a>
+                        <button type="submit" class="btn btn-primary">
+                            {% if form.instance.pk %}
+                            <i class="fas fa-save"></i> 保存更改
+                            {% else %}
+                            <i class="fas fa-plus"></i> 创建文章
+                            {% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

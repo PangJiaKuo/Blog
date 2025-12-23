@@ -1,0 +1,214 @@
+<!-- templates/blog/article_detail.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ article.title }} - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<article>
+    <header class="mb-4">
+        <h1 class="fw-bold mb-1">{{ article.title }}</h1>
+        <div class="text-muted mb-4">
+            <i class="bi bi-person"></i>
+            <a href="{% url 'accounts:profile' article.author.username %}"
+               class="text-decoration-none">{{ article.author.username }}</a> |
+            <i class="bi bi-folder"></i>
+            <i class="bi bi-folder"></i>
+            {% if article.category and article.category.slug %}
+                <a href="{% url 'blog:category' article.category.slug %}" class="text-decoration-none">
+                    {{ article.category.name }}
+                </a> |
+            {% else %}
+                <span class="text-muted">未分类</span> |
+            {% endif %}
+            <i class="bi bi-calendar"></i> {{ article.created_at|date:"Y年m月d日 H:i" }} |
+            <i class="bi bi-eye"></i> {{ article.view_count }}
+            <i class="bi bi-heart ms-2"></i> {{ article.like_count }}
+            <i class="bi bi-chat-left ms-2"></i> {{ article.comment_count }}
+        </div>
+
+        {% if article.featured_image %}
+        <img src="{{ article.featured_image.url }}" class="img-fluid rounded mb-4" alt="{{ article.title }}">
+        {% endif %}
+    </header>
+
+    <div class="article-content mb-5">
+        {{ article.content|safe }}
+    </div>
+
+    <!-- 标签 -->
+    {% if article.tags.all %}
+    <div class="mb-4">
+        <h5>标签：</h5>
+        {% for tag in article.tags.all %}
+        <a href="{% url 'blog:tag' tag.slug %}" class="badge bg-secondary text-decoration-none me-1">
+            <i class="bi bi-tag"></i> {{ tag.name }}
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <footer class="border-top pt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="btn-group" role="group">
+                    {% if user == article.author or user.is_staff %}
+                   <a href="{% url 'blog:article_update' article.slug %}" class="btn btn-outline-warning">
+                        <i class="bi bi-pencil"></i> 编辑
+                    </a>
+                    <a href="{% url 'blog:article_delete' article.slug %}" class="btn btn-outline-danger">
+                        <i class="bi bi-trash"></i> 删除
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-6 text-end">
+                <div class="btn-group" role="group">
+                    <!-- 点赞按钮 -->
+                    <button class="btn btn-outline-primary" onclick="likeArticle({{ article.id }})" id="like-btn">
+                        <i class="bi {% if has_liked %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
+                        <span id="like-count">{{ article.like_count }}</span>
+                    </button>
+
+                    <!-- 收藏按钮 -->
+                    <button class="btn btn-outline-warning" onclick="bookmarkArticle({{ article.id }})" id="bookmark-btn">
+                        <i class="bi {% if has_bookmarked %}bi-bookmark-fill{% else %}bi-bookmark{% endif %}"></i>
+                    </button>
+
+                    <!-- 分享按钮 -->
+                    <button class="btn btn-outline-secondary" onclick="shareArticle()">
+                        <i class="bi bi-share"></i> 分享
+                    </button>
+                </div>
+            </div>
+        </div>
+    </footer>
+</article>
+
+<!-- 相关文章 -->
+{% if related_articles %}
+<div class="mt-5 pt-5 border-top">
+    <h3 class="mb-4">相关文章</h3>
+    <div class="row">
+        {% for related in related_articles %}
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                {% if related.featured_image %}
+                <img src="{{ related.featured_image.url }}" class="card-img-top" alt="{{ related.title }}" height="150" style="object-fit: cover;">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'blog:article_detail' related.slug %}" class="text-decoration-none">
+                            {{ related.title|truncatechars:50 }}
+                        </a>
+                    </h5>
+                    <p class="card-text small">{{ related.excerpt|truncatechars:100 }}</p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <small class="text-muted">
+                        {{ related.created_at|date:"Y-m-d" }} | {{ related.view_count }}阅读
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- 上一篇/下一篇 -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        {% if prev_article %}
+        <div class="card">
+            <div class="card-body">
+                <small class="text-muted">上一篇</small>
+                <h6>
+                    <a href="{% url 'blog:article_detail' prev_article.slug %}" class="text-decoration-none">
+                        {{ prev_article.title }}
+                    </a>
+                </h6>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        {% if next_article %}
+        <div class="card">
+            <div class="card-body">
+                <small class="text-muted">下一篇</small>
+                <h6>
+                    <a href="{% url 'blog:article_detail' next_article.slug %}" class="text-decoration-none">
+                        {{ next_article.title }}
+                    </a>
+                </h6>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function likeArticle(articleId) {
+    fetch(`/blog/article/${articleId}/like/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.liked) {
+            document.getElementById('like-btn').innerHTML = '<i class="bi bi-heart-fill"></i> ' + data.likes_count;
+        } else {
+            document.getElementById('like-btn').innerHTML = '<i class="bi bi-heart"></i> ' + data.likes_count;
+        }
+        document.getElementById('like-count').textContent = data.likes_count;
+    });
+}
+
+function bookmarkArticle(articleId) {
+    fetch(`/blog/article/${articleId}/bookmark/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const btn = document.getElementById('bookmark-btn');
+        if (data.bookmarked) {
+            btn.innerHTML = '<i class="bi bi-bookmark-fill"></i>';
+        } else {
+            btn.innerHTML = '<i class="bi bi-bookmark"></i>';
+        }
+        alert(data.message);
+    });
+}
+
+function shareArticle() {
+    const title = '{{ article.title }}';
+    const url = window.location.href;
+    const text = `推荐文章：《${title}》 ${url}`;
+
+    if (navigator.share) {
+        navigator.share({
+            title: title,
+            text: '分享这篇文章给你',
+            url: url
+        });
+    } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('文章链接已复制到剪贴板');
+        });
+    } else {
+        prompt('请复制以下链接分享：', text);
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,60 @@
+<!-- blog/templates/blog/article_confirm_delete.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}删除文章 - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg border-danger">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    确认删除文章
+                </h4>
+            </div>
+            <div class="card-body text-center">
+                <div class="mb-4">
+                    <i class="bi bi-trash display-1 text-danger"></i>
+                </div>
+
+                <h3 class="mb-3">确定要删除这篇文章吗？</h3>
+
+                <div class="card mb-4">
+                    <div class="card-body text-start">
+                        <h5 class="card-title">{{ object.title }}</h5>
+                        <div class="text-muted small">
+                            <i class="bi bi-person"></i> {{ object.author.username }}
+                            <i class="bi bi-calendar ms-2"></i> {{ object.created_at|date:"Y-m-d H:i" }}
+                            <i class="bi bi-eye ms-2"></i> {{ object.view_count }}
+                            <i class="bi bi-heart ms-2"></i> {{ object.like_count }}
+                        </div>
+                        {% if object.excerpt %}
+                        <p class="card-text mt-2">{{ object.excerpt|truncatechars:200 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="alert alert-warning">
+                    <i class="bi bi-info-circle me-2"></i>
+                    此操作无法撤销！文章删除后将无法恢复，包括所有评论、点赞和收藏记录。
+                </div>
+
+                <form method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-lg me-2">
+                        <i class="bi bi-check-circle me-2"></i> 确认删除
+                    </button>
+                    <a href="{{ object.get_absolute_url }}" class="btn btn-outline-secondary btn-lg">
+                        <i class="bi bi-x-circle me-2"></i> 取消
+                    </a>
+                </form>
+            </div>
+            <div class="card-footer text-muted text-center">
+                <small>删除后文章ID为 #{{ object.id }} 的记录将从数据库中永久移除</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
