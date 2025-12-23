@@ -223,12 +223,13 @@ CORS_ALLOWED_ORIGINS= [
 ]
 
 # 邮件配置
-EMAIL_BACKEND= 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST= config('EMAIL_HOST')
-EMAIL_PORT= config('EMAIL_PORT', cast=int)
-EMAIL_USE_TLS= True
-EMAIL_HOST_USER= config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD= config('EMAIL_HOST_PASSWORD')
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.qq.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = '3464649103@qq.com'
+EMAIL_HOST_PASSWORD = 'mvsjozhszwafcjif'
+DEFAULT_FROM_EMAIL = '3464649103@qq.com'
 
 # CKEditor 配置
 CKEDITOR_CONFIGS= {

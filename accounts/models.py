@@ -5,6 +5,11 @@ from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 from .managers import CustomUserManager
 
+class CaptchaModel(models.Model):
+    email = models.EmailField(unique=True)
+    captcha = models.CharField(max_length=4)
+    create_time = models.DateTimeField(auto_now_add=True)
+
 
 class CustomUser(AbstractUser):
     """自定义用户模型"""
@@ -84,3 +89,4 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
+

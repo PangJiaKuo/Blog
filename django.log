@@ -8030,3 +8030,225 @@ Traceback (most recent call last):
 django.core.exceptions.FieldError: Cannot resolve keyword 'created' into field. Choices are: article, article_id, created_at, id, user, user_id
 "GET /blog/bookmarks/ HTTP/1.1" 500 112914
 "GET /blog/bookmarks/ HTTP/1.1" 500 112914
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET /blog/ HTTP/1.1" 200 25703
+"GET /blog/ HTTP/1.1" 200 25703
+"GET /static/css/style.css HTTP/1.1" 304 0
+"GET /static/css/style.css HTTP/1.1" 304 0
+"GET /static/js/main.js HTTP/1.1" 304 0
+"GET /static/js/main.js HTTP/1.1" 304 0
+"GET /media/article_images/2025/12/22/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_2025-11-14_215449.png HTTP/1.1" 304 0
+"GET /media/article_images/2025/12/22/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_2025-11-14_215449.png HTTP/1.1" 304 0
+"GET /media/article_images/2025/12/22/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_2025-11-21_162053.png HTTP/1.1" 304 0
+"GET /media/article_images/2025/12/22/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_2025-11-21_162053.png HTTP/1.1" 304 0
+"GET /media/article_images/2025/12/22/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_2025-11-29_200545.png HTTP/1.1" 304 0
+"GET /media/article_images/2025/12/22/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_2025-11-24_210327_8xkGDOQ.png HTTP/1.1" 304 0
+"GET /media/article_images/2025/12/22/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_2025-11-29_200545.png HTTP/1.1" 304 0
+"GET /media/article_images/2025/12/22/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_2025-11-24_210327_8xkGDOQ.png HTTP/1.1" 304 0
+"GET /media/profile_pics/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_2025-11-24_210327.png HTTP/1.1" 304 0
+"GET /media/profile_pics/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_2025-11-24_210327.png HTTP/1.1" 304 0
+Internal Server Error: /media/article_images/2025/12/22/\u5c4f\u5e55\u622a\u56fe_2025-11-29_200545_TVlVDfj.png
+Traceback (most recent call last):
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\utils\deprecation.py", line 311, in __call__
+    response = self.process_response(request, response)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\contrib\sessions\middleware.py", line 59, in process_response
+    request.session.save()
+    ~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\contrib\sessions\backends\cache.py", line 86, in save
+    elif self._cache.get(self.cache_key) is not None:
+         ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\core\cache\backends\filebased.py", line 36, in get
+    if not self._is_expired(f):
+           ~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\core\cache\backends\filebased.py", line 154, in _is_expired
+    exp = pickle.load(f)
+PermissionError: [Errno 13] Permission denied
+Internal Server Error: /media/article_images/2025/12/22/\u5c4f\u5e55\u622a\u56fe_2025-11-29_200545_TVlVDfj.png
+Traceback (most recent call last):
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\utils\deprecation.py", line 311, in __call__
+    response = self.process_response(request, response)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\contrib\sessions\middleware.py", line 59, in process_response
+    request.session.save()
+    ~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\contrib\sessions\backends\cache.py", line 86, in save
+    elif self._cache.get(self.cache_key) is not None:
+         ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\core\cache\backends\filebased.py", line 36, in get
+    if not self._is_expired(f):
+           ~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\core\cache\backends\filebased.py", line 154, in _is_expired
+    exp = pickle.load(f)
+PermissionError: [Errno 13] Permission denied
+"GET /media/article_images/2025/12/22/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_2025-11-29_200545_TVlVDfj.png HTTP/1.1" 500 92467
+"GET /media/article_images/2025/12/22/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_2025-11-29_200545_TVlVDfj.png HTTP/1.1" 500 92467
+"GET /static/favicon.ico HTTP/1.1" 404 1960
+"GET /static/favicon.ico HTTP/1.1" 404 1960
+"GET /accounts/logout/ HTTP/1.1" 302 0
+"GET /accounts/logout/ HTTP/1.1" 302 0
+"GET /accounts/login/ HTTP/1.1" 200 15254
+"GET /accounts/login/ HTTP/1.1" 200 15254
+"GET /accounts/register/ HTTP/1.1" 200 20070
+"GET /accounts/register/ HTTP/1.1" 200 20070
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET /accounts/register/ HTTP/1.1" 200 20070
+"GET /accounts/register/ HTTP/1.1" 200 20070
+D:\JB\python\blog_project\accounts\forms.py changed, reloading.
+D:\JB\python\blog_project\accounts\forms.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+D:\JB\python\blog_project\accounts\models.py changed, reloading.
+D:\JB\python\blog_project\accounts\models.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+D:\JB\python\blog_project\accounts\urls.py changed, reloading.
+D:\JB\python\blog_project\accounts\urls.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET /blog/ HTTP/1.1" 200 21815
+"GET /blog/ HTTP/1.1" 200 21815
+"GET /media/article_images/2025/12/22/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_2025-11-29_200545_TVlVDfj.png HTTP/1.1" 200 4393254
+"GET /media/article_images/2025/12/22/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_2025-11-29_200545_TVlVDfj.png HTTP/1.1" 200 4393254
+Internal Server Error: /accounts/register/
+Traceback (most recent call last):
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+  File "D:\JB\python\blog_project\accounts\views.py", line 42, in RegisterView
+    return render(request, 'register.html')
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: register.html
+Internal Server Error: /accounts/register/
+Traceback (most recent call last):
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+  File "D:\JB\python\blog_project\accounts\views.py", line 42, in RegisterView
+    return render(request, 'register.html')
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: register.html
+"GET /accounts/register/ HTTP/1.1" 500 103455
+"GET /accounts/register/ HTTP/1.1" 500 103455
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3146
+"GET /favicon.ico HTTP/1.1" 404 3146
+Internal Server Error: /accounts/register/
+Traceback (most recent call last):
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+  File "D:\JB\python\blog_project\accounts\views.py", line 42, in RegisterView
+    return render(request, 'register.html')
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: register.html
+Internal Server Error: /accounts/register/
+Traceback (most recent call last):
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+  File "D:\JB\python\blog_project\accounts\views.py", line 42, in RegisterView
+    return render(request, 'register.html')
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\simon\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: register.html
+"GET /accounts/register/ HTTP/1.1" 500 103592
+"GET /accounts/register/ HTTP/1.1" 500 103592
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+D:\JB\python\blog_project\accounts\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET /accounts/register/ HTTP/1.1" 200 21379
+"GET /accounts/register/ HTTP/1.1" 200 21379
+D:\JB\python\blog_project\accounts\forms.py changed, reloading.
+D:\JB\python\blog_project\accounts\forms.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader

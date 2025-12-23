@@ -2,8 +2,11 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.utils.translation import gettext_lazy as _
-from .models import CustomUser, UserProfile
+from .models import CustomUser, UserProfile, CaptchaModel
 from captcha.fields import CaptchaField
+from django.core.mail import send_mail
+from django.conf import settings
+import secrets
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -25,9 +28,24 @@ class CustomUserCreationForm(UserCreationForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.email = self.cleaned_data['email']
+        user.is_active = False  # 新增：设置用户为未激活状态
+
         if commit:
             user.save()
+            # 生成验证链接（最简单的方式）
+            self.send_verification_email(user)
+
         return user
+
+    def clean_captcha(self):
+        captcha = self.cleaned_data.get('captcha')
+        email = self.cleaned_data.get('email')
+
+        captcha_model = CaptchaModel.objects.filter(email=email, captcha=captcha).first()
+        if not captcha_model:
+            raise forms.ValidationError("验证码和邮箱不匹配！")
+        captcha_model.delete()
+        return captcha
 
 class CustomUserChangeForm(UserChangeForm):
     """用户信息修改表单"""
