@@ -428,7 +428,7 @@ class BookmarkListView(LoginRequiredMixin, ListView):
         ).order_by('-created_at')
 
         # 排序处理
-        sort = self.request.GET.get('sort', '-created')
+        sort = self.request.GET.get('sort', '-created_at')
         if sort:
             queryset = queryset.order_by(sort)
 

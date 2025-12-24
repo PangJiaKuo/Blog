@@ -142,3 +142,26 @@ footer .social-icons a:hover {
         font-size: 1.5rem;
     }
 }
+
+html {
+    min-height: 100%;
+    position: relative;
+}
+
+html:before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* 确保背景在所有内容下方 */
+    /* 修正后的路径（优先用绝对路径） */
+    background-image: url("http://127.0.0.1:8000/static/images/blog/images/32bdbe7b14a12ad6a2b073d858758ebe.jpg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    /* 可选：加背景遮罩，避免文字和背景冲突 */
+    background-color: rgba(255,255,255,0.2);
+    background-blend-mode: overlay;
+}

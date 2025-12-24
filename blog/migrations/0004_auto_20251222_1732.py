@@ -12,6 +12,7 @@ def add_programming_categories(apps, schema_editor):
         ('cpp', 'C++', 'C++编程语言相关文章'),
         ('java', 'Java', 'Java编程语言相关文章'),
         ('django', 'Django', 'Django框架相关文章'),
+        ('other','other','other'),
     ]
 
     for order, (slug, name, description) in enumerate(programming_categories, start=1):
