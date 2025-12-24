@@ -7,7 +7,8 @@ app_name = 'accounts'
 
 urlpatterns = [
     # 认证相关
-    path('register/', views.RegisterView, name='register'),
+    path('register/', views.register, name='register'),
+    path('send-captcha/', views.send_email_captcha, name='send_email_captcha'),
     path('login/', auth_views.LoginView.as_view(
         template_name='accounts/login.html',
         redirect_authenticated_user=True

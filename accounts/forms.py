@@ -7,46 +7,76 @@ from captcha.fields import CaptchaField
 from django.core.mail import send_mail
 from django.conf import settings
 import secrets
+from django.core.cache import cache
+from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
+CustomUser = get_user_model()
 
 class CustomUserCreationForm(UserCreationForm):
     """用户注册表单"""
-    email = forms.EmailField(required=True)
-    captcha = CaptchaField(label=_('验证码'))
+    # 验证码字段
+    captcha = forms.CharField(
+        label='邮箱验证码',
+        max_length=6,
+        min_length=6,
+        widget=forms.TextInput(attrs={'placeholder': '输入6位验证码'}),
+        error_messages={
+            'required': '请输入验证码',
+            'max_length': '验证码长度为6位',
+            'min_length': '验证码长度为6位'
+        }
+    )
+    # 邮箱字段（必填）
+    email = forms.EmailField(
+        required=True,
+        error_messages={'required': '请输入邮箱地址'}
+    )
 
     class Meta:
         model = CustomUser
-        fields = ('username', 'email', 'password1', 'password2')
+        fields = ('username', 'email', 'captcha', 'password1', 'password2')
 
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if CustomUser.objects.filter(email=email).exists():
-            raise forms.ValidationError(_('该邮箱已被注册'))
-        return email
+    # 初始化时接收request
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
 
-    # 添加保存方法
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.email = self.cleaned_data['email']
-        user.is_active = False  # 新增：设置用户为未激活状态
-
-        if commit:
-            user.save()
-            # 生成验证链接（最简单的方式）
-            self.send_verification_email(user)
-
-        return user
-
+    # 验证验证码（从Session读取）
     def clean_captcha(self):
-        captcha = self.cleaned_data.get('captcha')
-        email = self.cleaned_data.get('email')
+        captcha = self.cleaned_data.get('captcha', '').strip()
+        email = self.cleaned_data.get('email', '').strip().lower()
 
-        captcha_model = CaptchaModel.objects.filter(email=email, captcha=captcha).first()
-        if not captcha_model:
-            raise forms.ValidationError("验证码和邮箱不匹配！")
-        captcha_model.delete()
+        if not self.request:
+            raise forms.ValidationError('请求异常，请刷新页面重试')
+        if not email:
+            raise forms.ValidationError('请先输入邮箱地址')
+
+        # 从Session读取验证码
+        real_captcha = self.request.session.get(f'email_captcha_{email}')
+        if not real_captcha:
+            raise forms.ValidationError('验证码已过期或未发送，请重新获取')
+        if captcha != real_captcha:
+            raise forms.ValidationError('验证码错误，请重新输入')
+
+        # 验证后删除Session，防止重复使用
+        del self.request.session[f'email_captcha_{email}']
         return captcha
 
+    # 验证两次密码一致
+    def clean_password2(self):
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError('两次密码输入不一致')
+        return password2
+
+    # 清洗邮箱（转小写）
+    def clean_email(self):
+        email = self.cleaned_data.get('email', '').strip().lower()
+        if CustomUser.objects.filter(email=email).exists():
+            raise forms.ValidationError('该邮箱已被注册，请更换邮箱')
+        return email
 class CustomUserChangeForm(UserChangeForm):
     """用户信息修改表单"""
 

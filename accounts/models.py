@@ -48,8 +48,8 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = ['username']  # 添加 username 到必填字段
 
     class Meta:
-        verbose_name = _('user')
-        verbose_name_plural = _('users')
+        verbose_name = '用户'
+        verbose_name_plural = '用户'
 
     def __str__(self):
         return self.username

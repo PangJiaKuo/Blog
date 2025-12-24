@@ -24,123 +24,152 @@
                     <ul class="mb-0 mt-2">
                         {% for field, errors in form.errors.items %}
                             {% for error in errors %}
-                                {% if field != '__all__' %}
-                                <li>{{ field|title }}: {{ error }}</li>
-                                {% else %}
-                                <li>{{ error }}</li>
-                                {% endif %}
+                            <li>{{ field|title }}: {{ error }}</li>
                             {% endfor %}
                         {% endfor %}
                     </ul>
                 </div>
                 {% endif %}
 
-                <form method="post" novalidate>
+                <form method="post" novalidate id="register-form">
                     {% csrf_token %}
 
-                    <!-- 用户名 -->
-                    <div class="mb-3">
-                        <label for="id_username" class="form-label fw-bold">
-                            <i class="bi bi-person-badge me-1"></i> 用户名
-                        </label>
-                        <input type="text"
-                               name="username"
-                               id="id_username"
-                               class="form-control form-control-lg {% if form.username.errors %}is-invalid{% endif %}"
-                               value="{{ form.username.value|default:'' }}"
-                               placeholder="选择一个用户名"
-                               required
-                               autofocus>
-                        {% if form.username.errors %}
-                        <div class="invalid-feedback">
-                            {{ form.username.errors.0 }}
+                    <!-- 用户名+邮箱+验证码行容器 -->
+                    <div class="row">
+                        <!-- 用户名 -->
+                        <div class="col-md-6 mb-3">
+                            <label for="id_username" class="form-label fw-bold">
+                                <i class="bi bi-person-badge me-1"></i> 用户名
+                            </label>
+                            <input type="text"
+                                   name="username"
+                                   id="id_username"
+                                   class="form-control form-control-lg {% if form.username.errors %}is-invalid{% endif %}"
+                                   value="{{ form.username.value|default:'' }}"
+                                   placeholder="选择一个用户名"
+                                   required
+                                   autofocus>
+                            {% if form.username.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.username.errors.0 }}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">
+                                只能包含字母、数字和@/./+/-/_，长度在150个字符以内
+                            </div>
                         </div>
-                        {% endif %}
-                        <div class="form-text">
-                            只能包含字母、数字和@/./+/-/_，长度在150个字符以内
-                        </div>
-                    </div>
 
-                    <!-- 邮箱 -->
-                    <div class="mb-3">
-                        <label for="id_email" class="form-label fw-bold">
-                            <i class="bi bi-envelope me-1"></i> 邮箱地址
-                        </label>
-                        <input type="email"
-                               name="email"
-                               id="id_email"
-                               class="form-control form-control-lg {% if form.email.errors %}is-invalid{% endif %}"
-                               value="{{ form.email.value|default:'' }}"
-                               placeholder="您的邮箱地址"
-                               required>
-                        {% if form.email.errors %}
-                        <div class="invalid-feedback">
-                            {{ form.email.errors.0 }}
-                        </div>
-                        {% endif %}
-                        <div class="form-text">
-                            我们将通过此邮箱发送验证邮件
-                        </div>
-                    </div>
-
-                    <!-- 密码 -->
-                    <div class="mb-3">
-                        <label for="id_password1" class="form-label fw-bold">
-                            <i class="bi bi-key me-1"></i> 密码
-                        </label>
-                        <div class="input-group">
-                            <input type="password"
-                                   name="password1"
-                                   id="id_password1"
-                                   class="form-control form-control-lg {% if form.password1.errors %}is-invalid{% endif %}"
-                                   placeholder="设置密码"
+                        <!-- 邮箱 -->
+                        <div class="col-md-6 mb-3">
+                            <label for="id_email" class="form-label fw-bold">
+                                <i class="bi bi-envelope me-1"></i> 邮箱
+                            </label>
+                            <input type="email"
+                                   name="email"
+                                   id="id_email"
+                                   class="form-control form-control-lg {% if form.email.errors %}is-invalid{% endif %}"
+                                   value="{{ form.email.value|default:'' }}"
+                                   placeholder="您的邮箱地址"
                                    required>
-                            <button type="button"
-                                    class="btn btn-outline-secondary toggle-password"
-                                    data-target="id_password1">
-                                <i class="bi bi-eye"></i>
-                            </button>
+                            {% if form.email.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.email.errors.0 }}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">
+                                用于接收验证码和账户通知
+                            </div>
                         </div>
-                        {% if form.password1.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.password1.errors.0 }}
-                        </div>
-                        {% endif %}
-                        <div class="form-text">
-                            密码至少8位，不能太简单，不能全是数字
-                        </div>
-                    </div>
 
-                    <!-- 确认密码 -->
-                    <div class="mb-3">
-                        <label for="id_password2" class="form-label fw-bold">
-                            <i class="bi bi-key-fill me-1"></i> 确认密码
-                        </label>
-                        <div class="input-group">
-                            <input type="password"
-                                   name="password2"
-                                   id="id_password2"
-                                   class="form-control form-control-lg {% if form.password2.errors %}is-invalid{% endif %}"
-                                   placeholder="再次输入密码"
-                                   required>
-                            <button type="button"
-                                    class="btn btn-outline-secondary toggle-password"
-                                    data-target="id_password2">
-                                <i class="bi bi-eye"></i>
-                            </button>
+                        <!-- 邮箱验证码 -->
+                        <div class="col-md-12 mb-3">
+                            <label for="id_captcha" class="form-label fw-bold">
+                                <i class="bi bi-shield-lock me-1"></i> 邮箱验证码
+                            </label>
+                            <div class="input-group">
+                                <input type="text"
+                                       name="captcha"
+                                       id="id_captcha"
+                                       class="form-control form-control-lg {% if form.captcha.errors %}is-invalid{% endif %}"
+                                       placeholder="输入6位验证码"
+                                       maxlength="6"
+                                       minlength="6"
+                                       required>
+                                <button type="button"
+                                        class="btn btn-outline-secondary"
+                                        id="captcha-btn">
+                                    获取验证码
+                                </button>
+                            </div>
+                            {% if form.captcha.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.captcha.errors.0 }}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">
+                                验证码将发送至您的邮箱，有效期10分钟
+                            </div>
                         </div>
-                        {% if form.password2.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.password2.errors.0 }}
+
+                        <!-- 密码 -->
+                        <div class="col-md-6 mb-3">
+                            <label for="id_password1" class="form-label fw-bold">
+                                <i class="bi bi-key me-1"></i> 密码
+                            </label>
+                            <div class="input-group">
+                                <input type="password"
+                                       name="password1"
+                                       id="id_password1"
+                                       class="form-control form-control-lg {% if form.password1.errors %}is-invalid{% endif %}"
+                                       placeholder="设置密码"
+                                       required>
+                                <button type="button"
+                                        class="btn btn-outline-secondary toggle-password"
+                                        data-target="id_password1">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            {% if form.password1.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.password1.errors.0 }}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">
+                                密码至少8位，不能太简单，不能全是数字
+                            </div>
                         </div>
-                        {% endif %}
-                        <div class="form-text">
-                            请再次输入密码以确认
+
+                        <!-- 确认密码 -->
+                        <div class="col-md-6 mb-3">
+                            <label for="id_password2" class="form-label fw-bold">
+                                <i class="bi bi-key-fill me-1"></i> 确认密码
+                            </label>
+                            <div class="input-group">
+                                <input type="password"
+                                       name="password2"
+                                       id="id_password2"
+                                       class="form-control form-control-lg {% if form.password2.errors %}is-invalid{% endif %}"
+                                       placeholder="再次输入密码"
+                                       required>
+                                <button type="button"
+                                        class="btn btn-outline-secondary toggle-password"
+                                        data-target="id_password2">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            {% if form.password2.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.password2.errors.0 }}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">
+                                请再次输入密码以确认
+                            </div>
                         </div>
-                    </div>
+                    </div> <!-- 关闭row容器 -->
 
                     <!-- 密码强度指示器 -->
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <div class="d-flex justify-content-between mb-1">
                             <span class="small">密码强度：</span>
                             <span class="small" id="password-strength-text">未评估</span>
@@ -153,27 +182,13 @@
                         </div>
                     </div>
 
-                    <!-- 验证码 -->
-                    <div class="mb-3">
-                        <label for="id_captcha" class="form-label fw-bold">
-                            <i class="bi bi-shield-check me-1"></i> 验证码
-                        </label>
-                        {{ form.captcha }}
-                        {% if form.captcha.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.captcha.errors.0 }}
-                        </div>
-                        {% endif %}
-                    </div>
-
                     <!-- 服务条款 -->
                     <div class="form-check mb-4">
                         <input class="form-check-input"
                                type="checkbox"
-                               name="agree_terms"
-                               id="agree_terms"
+                               id="agree-terms"
                                required>
-                        <label class="form-check-label small" for="agree_terms">
+                        <label class="form-check-label small" for="agree-terms">
                             我已阅读并同意
                             <a href="#" class="text-decoration-none">服务条款</a>
                             和
@@ -187,39 +202,39 @@
                             <i class="bi bi-person-plus me-2"></i> 注册账户
                         </button>
                     </div>
+
+                    <!-- 第三方登录（可选） -->
+                    <div class="text-center mb-4">
+                        <div class="position-relative">
+                            <hr>
+                            <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small">
+                                或使用第三方账号
+                            </span>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-3 mt-4">
+                            <button type="button" class="btn btn-outline-primary">
+                                <i class="bi bi-google"></i> Google
+                            </button>
+                            <button type="button" class="btn btn-outline-dark">
+                                <i class="bi bi-github"></i> GitHub
+                            </button>
+                            <button type="button" class="btn btn-outline-info">
+                                <i class="bi bi-weibo"></i> 微博
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 已有账户 -->
+                    <div class="text-center">
+                        <p class="mb-0">
+                            已有账户？
+                            <a href="{% url 'accounts:login' %}" class="fw-bold text-decoration-none">
+                                立即登录
+                            </a>
+                        </p>
+                    </div>
                 </form>
-
-                <!-- 第三方登录（可选） -->
-                <div class="text-center mb-4">
-                    <div class="position-relative">
-                        <hr>
-                        <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small">
-                            或使用第三方账号
-                        </span>
-                    </div>
-
-                    <div class="d-flex justify-content-center gap-3 mt-4">
-                        <button type="button" class="btn btn-outline-primary">
-                            <i class="bi bi-google"></i> Google
-                        </button>
-                        <button type="button" class="btn btn-outline-dark">
-                            <i class="bi bi-github"></i> GitHub
-                        </button>
-                        <button type="button" class="btn btn-outline-info">
-                            <i class="bi bi-weibo"></i> 微博
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 已有账户 -->
-                <div class="text-center">
-                    <p class="mb-0">
-                        已有账户？
-                        <a href="{% url 'accounts:login' %}" class="fw-bold text-decoration-none">
-                            立即登录
-                        </a>
-                    </p>
-                </div>
             </div>
 
             <div class="card-footer bg-light text-center py-3">
@@ -247,103 +262,213 @@
     border-left: 0;
 }
 
-/* 密码强度颜色 */
-.strength-0 { background-color: #dc3545; }
-.strength-1 { background-color: #ffc107; }
-.strength-2 { background-color: #198754; }
+/* 验证码按钮倒计时样式 */
+#captcha-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
 </style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+// 兼容低版本浏览器的DOM获取
+function getElementById(id) {
+    return document.getElementById(id) || null;
+}
+
 // 密码显示/隐藏切换
-document.querySelectorAll('.toggle-password').forEach(button => {
+document.querySelectorAll('.toggle-password').forEach(function(button) {
     button.addEventListener('click', function() {
         const targetId = this.getAttribute('data-target');
-        const input = document.getElementById(targetId);
+        const input = getElementById(targetId);
         const icon = this.querySelector('i');
 
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.classList.remove('bi-eye');
-            icon.classList.add('bi-eye-slash');
-        } else {
-            input.type = 'password';
-            icon.classList.remove('bi-eye-slash');
-            icon.classList.add('bi-eye');
+        if (input && icon) {
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
         }
     });
 });
 
-// 密码强度检查
-const passwordInput = document.getElementById('id_password1');
-const strengthBar = document.getElementById('password-strength-bar');
-const strengthText = document.getElementById('password-strength-text');
+// 密码强度检查（增强版）
+const passwordInput = getElementById('id_password1');
+const strengthBar = getElementById('password-strength-bar');
+const strengthText = getElementById('password-strength-text');
 
-if (passwordInput) {
+if (passwordInput && strengthBar && strengthText) {
     passwordInput.addEventListener('input', function() {
         const password = this.value;
         let strength = 0;
         let text = '非常弱';
+        let barClass = 'bg-danger';
 
-        // 检查长度
+        // 基础长度检查
         if (password.length >= 8) strength += 1;
         if (password.length >= 12) strength += 1;
 
-        // 检查字符类型
+        // 字符类型检查
         if (/[A-Z]/.test(password)) strength += 1;  // 大写字母
         if (/[a-z]/.test(password)) strength += 1;  // 小写字母
         if (/[0-9]/.test(password)) strength += 1;  // 数字
         if (/[^A-Za-z0-9]/.test(password)) strength += 1;  // 特殊字符
 
-        // 限制最大强度为4
-        strength = Math.min(strength, 4);
+        // 限制最大强度为6，转换为百分比
+        strength = Math.min(strength, 6);
+        const percentage = (strength / 6) * 100;
 
-        // 更新进度条和文本
-        const percentage = (strength / 4) * 100;
-        strengthBar.style.width = `${percentage}%`;
-        strengthBar.classList.remove('bg-danger', 'bg-warning', 'bg-success');
-
-        if (strength <= 1) {
-            strengthBar.classList.add('bg-danger');
+        // 更新强度文本和样式
+        if (strength <= 2) {
             text = '非常弱';
-        } else if (strength <= 2) {
-            strengthBar.classList.add('bg-warning');
+            barClass = 'bg-danger';
+        } else if (strength <= 4) {
             text = '一般';
+            barClass = 'bg-warning';
         } else {
-            strengthBar.classList.add('bg-success');
             text = '非常强';
+            barClass = 'bg-success';
         }
 
+        // 应用样式
+        strengthBar.style.width = `${percentage}%`;
+        strengthBar.className = `progress-bar ${barClass}`;
         strengthText.textContent = text;
     });
 }
 
-// 表单验证
-document.querySelector('form').addEventListener('submit', function(e) {
-    const terms = document.getElementById('agree_terms');
-    if (!terms.checked) {
-        e.preventDefault();
-        alert('请同意服务条款和隐私政策');
-        terms.focus();
-        return false;
+// 表单提交验证（增强版）
+const registerForm = getElementById('register-form');
+if (registerForm) {
+    registerForm.addEventListener('submit', function(e) {
+        // 1. 检查服务条款
+        const terms = getElementById('agree-terms');
+        if (!terms || !terms.checked) {
+            e.preventDefault();
+            alert('请同意服务条款和隐私政策');
+            terms?.focus();
+            return false;
+        }
+
+        // 2. 检查密码一致性
+        const password1 = getElementById('id_password1')?.value || '';
+        const password2 = getElementById('id_password2')?.value || '';
+        if (password1 !== password2) {
+            e.preventDefault();
+            alert('两次输入的密码不一致，请重新输入');
+            getElementById('id_password2')?.focus();
+            return false;
+        }
+
+        // 3. 检查密码长度
+        if (password1.length < 8) {
+            e.preventDefault();
+            alert('密码至少需要8个字符');
+            getElementById('id_password1')?.focus();
+            return false;
+        }
+
+        // 4. 检查验证码非空
+        const captcha = getElementById('id_captcha')?.value || '';
+        if (!captcha || captcha.length !== 6) {
+            e.preventDefault();
+            alert('请输入6位有效验证码');
+            getElementById('id_captcha')?.focus();
+            return false;
+        }
+
+        // 5. 检查邮箱格式
+        const email = getElementById('id_email')?.value || '';
+        const emailReg = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailReg.test(email)) {
+            e.preventDefault();
+            alert('请输入有效的邮箱地址');
+            getElementById('id_email')?.focus();
+            return false;
+        }
+    });
+}
+
+// 验证码按钮逻辑（优化版）
+document.addEventListener('DOMContentLoaded', function() {
+    const captchaBtn = getElementById('captcha-btn');
+    const emailInput = getElementById('id_email');
+    let countdown = 0;
+    const emailReg = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    // 验证码倒计时函数
+    function startCountdown() {
+        countdown = 60;
+        captchaBtn.disabled = true;
+        captchaBtn.textContent = `重新获取(${countdown}s)`;
+
+        const timer = setInterval(function() {
+            countdown--;
+            captchaBtn.textContent = `重新获取(${countdown}s)`;
+
+            if (countdown <= 0) {
+                clearInterval(timer);
+                countdown = 0;
+                captchaBtn.disabled = false;
+                captchaBtn.textContent = '获取验证码';
+            }
+        }, 1000);
     }
 
-    const password1 = document.getElementById('id_password1').value;
-    const password2 = document.getElementById('id_password2').value;
+    // 点击获取验证码
+    if (captchaBtn && emailInput) {
+        captchaBtn.addEventListener('click', function() {
+            if (countdown > 0) return;
 
-    if (password1 !== password2) {
-        e.preventDefault();
-        alert('两次输入的密码不一致，请重新输入');
-        document.getElementById('id_password2').focus();
-        return false;
-    }
+            const email = emailInput.value.trim();
+            // 1. 检查邮箱非空
+            if (!email) {
+                alert('请先输入邮箱地址');
+                emailInput.focus();
+                return;
+            }
+            // 2. 检查邮箱格式
+            if (!emailReg.test(email)) {
+                alert('请输入有效的邮箱地址（如：yourname@example.com）');
+                emailInput.focus();
+                return;
+            }
 
-    if (password1.length < 8) {
-        e.preventDefault();
-        alert('密码至少需要8个字符');
-        document.getElementById('id_password1').focus();
-        return false;
+            // 发送AJAX请求获取验证码
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', "{% url 'accounts:send_email_captcha' %}", true);
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.setRequestHeader('X-CSRFToken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            const data = JSON.parse(xhr.responseText);
+                            if (data.status === 'success') {
+                                alert(data.msg);
+                                startCountdown();
+                            } else {
+                                alert(data.msg || '获取验证码失败');
+                            }
+                        } catch (e) {
+                            alert('验证码请求返回格式错误，请稍后重试');
+                        }
+                    } else {
+                        alert('网络错误，状态码：' + xhr.status);
+                    }
+                }
+            };
+
+            xhr.send(`email=${encodeURIComponent(email)}`);
+        });
     }
 });
 </script>

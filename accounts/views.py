@@ -1,4 +1,6 @@
 # accounts/views.py
+import traceback
+
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.contrib.auth import login, logout, update_session_auth_hash, get_user_model
 from django.contrib.auth.decorators import login_required
@@ -19,6 +21,8 @@ import random
 import string
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.models import User
+from django.conf import settings
+from django.core.cache import cache
 
 
 # class RegisterView(CreateView):
@@ -54,18 +58,50 @@ def RegisterView(request):
             return redirect(reverse('accounts:register'))
             # return render(request, 'register.html', context={"form": form})
 
+
 def send_email_captcha(request):
-    # ?email=xxx
-    email = request.GET.get('email')
-    if not email:
-        return JsonResponse({"code": 400, "message": '必须传递邮箱！'})
-    # 生成验证码（取随机的4位阿拉伯数字）
-    # ['0', '2', '9', '8']
-    captcha = "".join(random.sample(string.digits, 4))
-    # 存储到数据库中
-    CaptchaModel.objects.update_or_create(email=email, defaults={'captcha': captcha})
-    send_mail("博客注册验证码", message=f"您的注册验证码是：{captcha}", recipient_list=[email],from_email=None)
-    return JsonResponse({"code": 200, "message": "邮箱验证码发送成功！"})
+    # 检查是否为AJAX POST请求
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    if request.method == 'POST' and is_ajax:
+        email = request.POST.get('email', '').strip().lower()
+        if not email:
+            return JsonResponse({'status': 'error', 'msg': '请输入邮箱地址'})
+
+        # 生成6位验证码
+        captcha = ''.join(random.choices(string.digits, k=6))
+        # 存储到Session，有效期10分钟
+        request.session[f'email_captcha_{email}'] = captcha
+        request.session.set_expiry(600)  # 600秒=10分钟
+
+        # 发送邮件
+        try:
+            send_mail(
+                subject='【你的网站】注册验证码',
+                message=f'你的注册验证码是：{captcha}，有效期10分钟，请勿泄露给他人。',
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[email],
+                fail_silently=False,
+            )
+            return JsonResponse({'status': 'success', 'msg': '验证码已发送至你的邮箱，请查收'})
+        except Exception as e:
+            print("邮件发送错误：", traceback.format_exc())
+            return JsonResponse({'status': 'error', 'msg': f'邮件发送失败：{str(e)}'})
+    return JsonResponse({'status': 'error', 'msg': '请求方式错误'})
+
+
+# 注册视图（传递request给表单）
+def register(request):
+    if request.method == 'POST':
+        # 关键：把request传给表单，用于读取Session
+        form = CustomUserCreationForm(request.POST, request=request)
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, '注册成功！请登录')
+            return redirect('accounts:login')  # 确保login路由命名空间正确
+    else:
+        form = CustomUserCreationForm(request=request)
+
+    return render(request, 'accounts/register.html', {'form': form})
 
 class ProfileView(DetailView):
     """用户资料页面"""
